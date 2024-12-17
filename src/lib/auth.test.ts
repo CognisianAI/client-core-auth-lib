@@ -7,6 +7,7 @@ import {
     verifySig,
 } from "./keypair";
 
+
 test("AuthUser function", async () => {
     const [tk, e] = await AuthUser(
         "http://localhost:4000",
@@ -14,11 +15,10 @@ test("AuthUser function", async () => {
         "test",
     );
     if (e != "") {
-        console.log("Error in GenLoginToken", e);
+        console.log("Error in AuthUser", e);
         return;
     }
     console.log("Token", tk);
-    //   expect(greet("World")).toBe("Hello, World!");
 });
 
 test("seedToPrivateKey function", async () => {

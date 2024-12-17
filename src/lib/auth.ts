@@ -1,4 +1,6 @@
-import { publicKeyFromPrivateKey, seedToPrivateKey, signMessage, verifySig } from "./keypair";
+import { Sha256 } from "@aws-crypto/sha256-js";
+import {  seedToPrivateKey, signMessage } from "./keypair";
+import { bytesToHex } from "@noble/hashes/utils";
 
 type AuthUserFn = (
   endpoint: string,
@@ -13,7 +15,12 @@ type DeauthUserFn = (
 const API_AUTH_PATH = `/auth`;
 
 const AuthUser: AuthUserFn = async (endpoint, email, password) => {
-  const privateKey = await seedToPrivateKey(password);
+  const hash = new Sha256();
+  hash.update(email+password);
+  const passHash = await hash.digest();
+
+  const privateKey = await seedToPrivateKey(bytesToHex(passHash));
+
   const session_seed = new Date().valueOf().toString();
 
   const sig = await signMessage(privateKey, session_seed);
