@@ -1,6 +1,6 @@
 {
   "name": "@cognisian/client-core-auth-lib",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
