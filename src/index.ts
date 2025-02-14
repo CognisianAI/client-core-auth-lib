@@ -1,3 +1,3 @@
-import {AuthUser, DeauthUser,GenLoginToken}from './lib/auth';
+import {AuthUser, DeauthUser,GenLoginToken,GenPassPubkey}from './lib/auth';
 
-export {AuthUser, DeauthUser,GenLoginToken};
+export {AuthUser, DeauthUser,GenLoginToken,GenPassPubkey};

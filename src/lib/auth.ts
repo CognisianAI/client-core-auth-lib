@@ -1,5 +1,5 @@
 import { Sha256 } from "@aws-crypto/sha256-js";
-import {  seedToPrivateKey, signMessage } from "./keypair";
+import {  publicKeyFromPrivateKey, seedToPrivateKey, signMessage } from "./keypair";
 import { bytesToHex } from "@noble/hashes/utils";
 
 type AuthUserFn = (
@@ -14,12 +14,25 @@ type DeauthUserFn = (
 
 const API_AUTH_PATH = `/auth`;
 
-const AuthUser: AuthUserFn = async (endpoint, email, password) => {
+const genPrivateKey = async (id: string, password: string) => {
   const hash = new Sha256();
-  hash.update(email+password);
+  hash.update(id+password);
   const passHash = await hash.digest();
 
   const privateKey = await seedToPrivateKey(bytesToHex(passHash));
+  return privateKey;
+}
+
+const GenPassPubkey = async (id: string, password: string) => {
+  const privateKey = await genPrivateKey(id, password);
+
+  const pubKey = await publicKeyFromPrivateKey(privateKey);
+  return pubKey;
+}
+
+const AuthUser: AuthUserFn = async (endpoint, id, password) => {
+  const privateKey = await genPrivateKey(id, password);
+  const pubKey = await publicKeyFromPrivateKey(privateKey);
 
   const session_seed = new Date().valueOf().toString();
 
@@ -33,7 +46,7 @@ const AuthUser: AuthUserFn = async (endpoint, email, password) => {
       "Access-Control-Allow-Origin": "*",
     }, // Required for CORS support to work
     body: JSON.stringify({
-      email: email,
+      pubkey: pubKey,
       session_seed: session_seed,
       signature: sig,
     }),
@@ -142,4 +155,4 @@ function JsonRpcRequest(
   };
 }
 
-export { AuthUser, DeauthUser, GenLoginToken };
+export { AuthUser, DeauthUser, GenLoginToken ,GenPassPubkey};
